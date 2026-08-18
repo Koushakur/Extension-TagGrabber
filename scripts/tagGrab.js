@@ -24,23 +24,23 @@ function DisplayCopyFeedback(button) {
       let extantOverlay = button.querySelector('[data-role="copied-overlay"]');
       if (extantOverlay) extantOverlay.remove();
 
-      let checkmarkElem = document.createElement("span");
+      let spanElement = document.createElement("span");
 
       let textColor = getComputedStyle(document.querySelector("#description.ytd-watch-metadata")).color;
 
-      checkmarkElem.dataset.role = "copied-overlay";
-      checkmarkElem.style.position = "absolute";
-      checkmarkElem.textContent = "Copied!";
-      checkmarkElem.style.pointerEvents = "none";
-      checkmarkElem.style.color = textColor;
-      checkmarkElem.style.fontSize = "1.5rem";
-      checkmarkElem.style.top = "-0.75em";
-      checkmarkElem.style.left = "50%";
+      spanElement.dataset.role = "copied-overlay";
+      spanElement.style.position = "absolute";
+      spanElement.textContent = "Copied!";
+      spanElement.style.pointerEvents = "none";
+      spanElement.style.color = textColor;
+      spanElement.style.fontSize = "1.5rem";
+      spanElement.style.top = "-0.75em";
+      spanElement.style.left = "50%";
 
       let displayTime = 1750;
 
       //Animate position
-      let animation = checkmarkElem.animate([
+      let animation = spanElement.animate([
          { transform: 'translate(-50%, 0)', easing: 'ease', offset: 0.0 },
          { transform: 'translate(-50%, -0.5em)', offset: 0.75 },
          { transform: 'translate(-50%, -0.5em)', offset: 1.0 }
@@ -49,7 +49,7 @@ function DisplayCopyFeedback(button) {
       });
 
       //Animate opacity
-      checkmarkElem.animate([
+      spanElement.animate([
          { opacity: 0, easing: 'ease' },
          { opacity: 1, easing: 'ease', offset: 0.1 },
          { opacity: 1, easing: 'ease', offset: 0.7 },
@@ -57,9 +57,11 @@ function DisplayCopyFeedback(button) {
       ], {
          duration: displayTime, fill: "forwards"
       });
-      animation.finished.then(() => checkmarkElem.remove());
 
-      button.appendChild(checkmarkElem);
+      //Remove element once the animation is completed
+      animation.finished.then(() => spanElement.remove());
+
+      button.appendChild(spanElement);
 
    } catch (e) {
       console.error("Error displaying copy feedback: ", e);
@@ -69,7 +71,6 @@ function DisplayCopyFeedback(button) {
 async function FetchTags() {
 
    try {
-
       let res = await fetch(location.href);
       let html = await res.text();
       let match = html.match(/<meta itemprop="keywords" content="([^"]*)"/);
@@ -81,7 +82,7 @@ async function FetchTags() {
          return htmlDecoder.value.replaceAll(",", ", ");
 
       } else
-         return "No tags :(";
+         return null;
 
    } catch (e) {
       console.error("Error fetching tags: ", e);
@@ -106,10 +107,10 @@ function GrabRaisedBackgroundColor(element) {
 async function InsertTagsButton() {
    if (isProcessing || !location.pathname.startsWith("/watch")) return;
 
-   let commentsElem = document.querySelector("#comments");
-   if (!commentsElem) return;
+   let commentsElement = document.querySelector("#comments");
+   if (!commentsElement) return;
 
-   if (commentsElem.previousElementSibling?.dataset?.grabTagsBtn) {
+   if (commentsElement.previousElementSibling?.dataset?.grabTagsBtn) {
       //Button exists, but update it if URL has changed
 
       if (location.href !== lastUrl) {
@@ -118,9 +119,13 @@ async function InsertTagsButton() {
          try {
             isProcessing = true;
 
-            commentsElem.previousElementSibling.children[1].textContent = await FetchTags();
+            let tags = await FetchTags();
 
-         } finally {
+            commentsElement.previousElementSibling.children[0].textContent = tags ? "Tags: " : "";
+            commentsElement.previousElementSibling.children[1].textContent = tags ?? "No tags :(";
+
+         } catch (e) { }
+         finally {
             isProcessing = false;
          }
       }
@@ -142,19 +147,21 @@ async function InsertTagsButton() {
          buttonElement.style.gap = "5px";
 
          //Text content spans
-         let labelSpan = document.createElement("span");
-         labelSpan.textContent = "Tags: ";
+         let tags = await FetchTags();
 
-         let tagsSpan = document.createElement("span");
-         tagsSpan.textContent = await FetchTags();
-         tagsSpan.style.textAlign = "left";
+         let labelSpanElement = document.createElement("span");
+         labelSpanElement.textContent = tags ? "Tags: " : "";
 
-         buttonElement.appendChild(labelSpan);
-         buttonElement.appendChild(tagsSpan);
+         let tagsSpanElement = document.createElement("span");
+         tagsSpanElement.textContent = tags ?? "No tags :(";
+         tagsSpanElement.style.textAlign = "left";
+
+         buttonElement.appendChild(labelSpanElement);
+         buttonElement.appendChild(tagsSpanElement);
 
          //Grabbing some colors from YouTube
-         let descriptionElem = document.querySelector("#description.ytd-watch-metadata");
-         let descriptionComputedStyle = getComputedStyle(descriptionElem);
+         let descriptionElement = document.querySelector("#description.ytd-watch-metadata");
+         let descriptionComputedStyle = getComputedStyle(descriptionElement);
 
          buttonElement.style.background = descriptionComputedStyle.backgroundColor;
          buttonElement.style.color = descriptionComputedStyle.color;
@@ -200,7 +207,7 @@ async function InsertTagsButton() {
          });
          //----
 
-         commentsElem.insertAdjacentElement("beforebegin", buttonElement);
+         commentsElement.insertAdjacentElement("beforebegin", buttonElement);
 
       } catch (e) { }
       finally {
