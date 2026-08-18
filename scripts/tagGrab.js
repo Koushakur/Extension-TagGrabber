@@ -9,7 +9,7 @@ async function CopyTagsToClipboard(e) {
 
       await navigator.clipboard.writeText(childs[0].textContent + childs[1].textContent)
          .then(() => {
-            DisplayCopyFeedback(button);
+            DisplayCopyFeedback(button, e.offsetX);
          });
 
    } catch (e) {
@@ -17,7 +17,7 @@ async function CopyTagsToClipboard(e) {
    }
 }
 
-function DisplayCopyFeedback(button) {
+function DisplayCopyFeedback(button, offsetX) {
 
    try {
       //Stop multiples from existing
@@ -35,7 +35,7 @@ function DisplayCopyFeedback(button) {
       spanElement.style.color = textColor;
       spanElement.style.fontSize = "1.5rem";
       spanElement.style.top = "-0.75em";
-      spanElement.style.left = "50%";
+      spanElement.style.left = offsetX + "px";
 
       let displayTime = 1750;
 
@@ -151,10 +151,12 @@ async function InsertTagsButton() {
 
          let labelSpanElement = document.createElement("span");
          labelSpanElement.textContent = tags ? "Tags: " : "";
+         labelSpanElement.style.pointerEvents = "none";
 
          let tagsSpanElement = document.createElement("span");
          tagsSpanElement.textContent = tags ?? "No tags :(";
          tagsSpanElement.style.textAlign = "left";
+         tagsSpanElement.style.pointerEvents = "none";
 
          buttonElement.appendChild(labelSpanElement);
          buttonElement.appendChild(tagsSpanElement);
