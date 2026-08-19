@@ -164,8 +164,9 @@ async function InsertTagsButton() {
          //Grabbing some colors from YouTube
          let descriptionMetadataElement = document.querySelector("#description.ytd-watch-metadata");
          let descriptionComputedStyle = getComputedStyle(descriptionMetadataElement);
+         let colorDescriptionBackground = descriptionComputedStyle.backgroundColor;
 
-         buttonElement.style.background = descriptionComputedStyle.backgroundColor;
+         buttonElement.style.background = colorDescriptionBackground;
          buttonElement.style.color = descriptionComputedStyle.color;
 
          //Font
@@ -196,7 +197,6 @@ async function InsertTagsButton() {
 
             else
                event.currentTarget.style.backgroundColor = GrabRaisedBackgroundColor(metadataElement);
-
          });
 
          buttonElement.addEventListener("mouseleave", (event) => {
@@ -204,7 +204,7 @@ async function InsertTagsButton() {
                event.currentTarget.style.color = descriptionComputedStyle.color;
 
             else
-               event.currentTarget.style.backgroundColor = descriptionComputedStyle.backgroundColor;
+               event.currentTarget.style.backgroundColor = colorDescriptionBackground;
          });
          //----
 
