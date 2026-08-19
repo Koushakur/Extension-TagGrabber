@@ -107,10 +107,10 @@ function GrabRaisedBackgroundColor(element) {
 async function InsertTagsButton() {
    if (isProcessing || !location.pathname.startsWith("/watch")) return;
 
-   let commentsElement = document.querySelector("#comments");
-   if (!commentsElement) return;
+   let videoInfoElement = document.querySelector("#above-the-fold");
+   if (!videoInfoElement) return;
 
-   if (commentsElement.previousElementSibling?.dataset?.grabTagsBtn) {
+   if (videoInfoElement.nextElementSibling?.dataset?.grabTagsBtn) {
       //Button exists, but update it if URL has changed
 
       if (location.href !== lastUrl) {
@@ -121,8 +121,8 @@ async function InsertTagsButton() {
 
             let tags = await FetchTags();
 
-            commentsElement.previousElementSibling.children[0].textContent = tags ? "Tags: " : "";
-            commentsElement.previousElementSibling.children[1].textContent = tags ?? "No tags :(";
+            videoInfoElement.nextElementSibling.children[0].textContent = tags ? "Tags: " : "";
+            videoInfoElement.nextElementSibling.children[1].textContent = tags ?? "No tags :(";
 
          } catch (e) { }
          finally {
@@ -162,8 +162,8 @@ async function InsertTagsButton() {
          buttonElement.appendChild(tagsSpanElement);
 
          //Grabbing some colors from YouTube
-         let descriptionElement = document.querySelector("#description.ytd-watch-metadata");
-         let descriptionComputedStyle = getComputedStyle(descriptionElement);
+         let descriptionMetadataElement = document.querySelector("#description.ytd-watch-metadata");
+         let descriptionComputedStyle = getComputedStyle(descriptionMetadataElement);
 
          buttonElement.style.background = descriptionComputedStyle.backgroundColor;
          buttonElement.style.color = descriptionComputedStyle.color;
@@ -182,8 +182,7 @@ async function InsertTagsButton() {
          buttonElement.style.borderStyle = "none";
          buttonElement.style.borderRadius = "12px";
          buttonElement.style.padding = "8px";
-         buttonElement.style.marginTop = "-10px";
-         buttonElement.style.marginBottom = "-10px";
+         buttonElement.style.marginTop = "13px";
 
          buttonElement.dataset.grabTagsBtn = "true";
 
@@ -209,7 +208,7 @@ async function InsertTagsButton() {
          });
          //----
 
-         commentsElement.insertAdjacentElement("beforebegin", buttonElement);
+         videoInfoElement.insertAdjacentElement("afterend", buttonElement);
 
       } catch (e) { }
       finally {
