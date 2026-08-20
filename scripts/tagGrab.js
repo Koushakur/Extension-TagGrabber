@@ -42,8 +42,8 @@ function DisplayCopyFeedback(button, offsetX) {
       //Animate position
       let animation = spanElement.animate([
          { transform: 'translate(-50%, 0)', easing: 'ease', offset: 0.0 },
-         { transform: 'translate(-50%, -0.5em)', offset: 0.75 },
-         { transform: 'translate(-50%, -0.5em)', offset: 1.0 }
+         { transform: 'translate(-50%, -0.45rem)', offset: 0.75 },
+         { transform: 'translate(-50%, -0.45rem)', offset: 1.0 }
       ], {
          duration: displayTime, fill: "forwards"
       });
@@ -98,10 +98,6 @@ function ThemeIsActive() {
    } catch (e) {
       return [false, ""];
    }
-}
-
-function GrabRaisedBackgroundColor(element) {
-   return getComputedStyle(element).getPropertyValue("--yt-saturated-raised-background").trim();
 }
 
 async function InsertTagsButton() {
@@ -196,7 +192,7 @@ async function InsertTagsButton() {
                event.currentTarget.style.color = themeColor;
 
             else
-               event.currentTarget.style.backgroundColor = GrabRaisedBackgroundColor(metadataElement);
+               event.currentTarget.style.backgroundColor = getComputedStyle(metadataElement).getPropertyValue("--yt-saturated-raised-background").trim();
          });
 
          buttonElement.addEventListener("mouseleave", (event) => {
